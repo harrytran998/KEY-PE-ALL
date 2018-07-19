@@ -1,7 +1,7 @@
 import java.util.*;
 import java.io.*;
 
-public class MyList {
+public class Q1_MyList {
 
     public void addLast(Person c) {
         Node p = new Node(c);
@@ -23,7 +23,6 @@ public class MyList {
         Person c = new Person(xName, xAge);
         addLast(c);
     }
-
 
     /*
     add first
@@ -550,7 +549,6 @@ public class MyList {
         return p;
     }
 
-
     /**
      * Swap Max Min Node
      */
@@ -715,6 +713,4 @@ public class MyList {
             }
         }
     }
-
-
 }
