@@ -10,6 +10,7 @@
     private final String password = "<Your Password>";
 ```
 - Enjoy this Project
-Attention : 
+---
+***Attention :*** 
 If you want to search The informations of students with properties =>  Just turn off comment of function : `initProperties`  on function `initTableSQL` 
 
