@@ -75,6 +75,69 @@ public class Q2_BSTree {
      * Perform pre-order traversal from the root 
      * Having age > 4
      */
+
+    /**
+     * Find father
+     */
+    public Node findFather(int xPrice) {
+        Node f, p;
+        f = null;
+        p = root;
+        while (p != null) {
+            if (p.info.price == xPrice) break;
+            f = p;
+            if (xPrice < p.info.price)
+                p = p.left;
+            else p = p.right;
+        }
+        return f;
+    }
+
+    /**
+     * F4
+     */
+    public void xx(){
+        Queue queue = new ArrayDeque();
+        //Pair tempP=new Pair(root, null);
+        Node save = null;
+        queue.add(root);
+        while (!queue.isEmpty()) {
+            //Pair tt=(Pair) queue.poll();
+            Node temp = (Node) queue.poll();
+            if (temp.left != null && temp.info.price < 7) {
+                save = temp;
+                break;
+            }
+            if (temp.left != null) queue.add(temp.left);
+            if (temp.right != null) queue.add(temp.right);
+        }
+        int xPrice = save.info.price;
+        Node r = rotateRight(save);
+        Node q = findFather(xPrice);
+        if (q == null) {
+            root = r;
+        } else {
+            if (q.left == save) q.left = r;
+            else q.right = r;
+        }
+    }
+
+    public void deleHaving2Soon_PriceLess() {
+        //f3
+        Queue queue = new ArrayDeque();
+        queue.add(root);
+        while (!queue.isEmpty()) {
+            Node temp = (Node) queue.poll();
+            if (temp.left != null && temp.right != null && temp.info.price < 7) {
+                deleteByCopying(temp.info.price);
+                break;
+            }
+            if (temp.left != null) queue.add(temp.left);
+            if (temp.right != null) queue.add(temp.right);
+        }
+    }
+
+
     void preOrderf2(Node p, RandomAccessFile f) throws Exception {
         if (p == null) {
             return;
@@ -84,6 +147,13 @@ public class Q2_BSTree {
         }
         preOrderf6(p.left, f);
         preOrderf6(p.right, f);
+    }
+
+    void preOrder3(Node p, RandomAccessFile f, int minn, int maxx) throws Exception {
+        if (p == null) return;
+        if (minn <= p.info.price && p.info.price <= maxx) fvisit(p, f);
+        preOrder3(p.left, f, minn, maxx);
+        preOrder3(p.right, f, minn, maxx);
     }
 
     /**
@@ -106,22 +176,22 @@ public class Q2_BSTree {
         }
     }
 
-     /**
+    /**
      * Delete Node min K - Inorder
      */
-    int c = 0; 
-    public void inorderDeleteNodeNhoNhatThu2CoKeyNhoHonRoot(Node p, int K) {              // Ten ham khac"
-    if (p == null) {
+    int c = 0;
+    public void inorderDeleteNodeNhoNhatThu2CoKeyNhoHonRoot(Node p, int K) { // Ten ham khac"
+        if (p == null) {
             return;
         }
         if (c < K) {
             inorder(p.left);
             String key = root.info.name;
             if (p != root && p.info.name.compareToIgnoreCase(key) < 0) {
-                c++;           
+                c++;
                 if (c == 2) {
                     deleteByCopy(p);
-                    return;                 
+                    return;
                 }
             }
             inorder(p.right);
@@ -261,62 +331,65 @@ public class Q2_BSTree {
      * Delete By Merge - int X
      */
     public void deleteByMerging(int x) {
-        if(isEmpty()) return;
+        if (isEmpty()) return;
         Node p = getNode(x);
-        if(p == null) {
+        if (p == null) {
             System.out.println("Key does not exists, deletin failed");
             return;
         }
         //find node f where f is father of p
         Node f = null, q = root;
-        while(q != p) {
-            if(q.info > x) {
-                f = q; q = q.left;
-            }else {
-                f = q; q = q.right;
+        while (q != p) {
+            if (q.info > x) {
+                f = q;
+                q = q.left;
+            } else {
+                f = q;
+                q = q.right;
             }
         }
         //1. p is a leaf (no right and left child)
-        if(p.left == null && p.right == null) {
-            if(f == null) {//a bst has a node only
+        if (p.left == null && p.right == null) {
+            if (f == null) { //a bst has a node only
                 root = null;
-            }else if(f.left == p) f.left = null;
-            else if(f.right == p) f.right = null;
+            } else if (f.left == p) f.left = null;
+            else if (f.right == p) f.right = null;
         }
         //2. p has a left child only
-        else if(p.left != null && p.right == null) {
-            if(f == null) {//remove root
+        else if (p.left != null && p.right == null) {
+            if (f == null) { //remove root
                 root = p.left;
-            }else if(f.right == p) f.right = p.left;
-            else if(f.left == p) f.left = p.left;
+            } else if (f.right == p) f.right = p.left;
+            else if (f.left == p) f.left = p.left;
         }
         //3. p has a right child only
-        else if(p.right != null && p.left == null) {
-            if(f == null) {//remove root
+        else if (p.right != null && p.left == null) {
+            if (f == null) { //remove root
                 root = p.right;
-            }else if(f.right == p) f.right = p.right;
-            else if(f.left == p) f.left = p.right;
+            } else if (f.right == p) f.right = p.right;
+            else if (f.left == p) f.left = p.right;
         }
         //4. p has both left and right child
-        else if(p.left != null && p.right != null) {
+        else if (p.left != null && p.right != null) {
             //tim node lon nhat ben cay con trai cua p
-            q = p.left; Node t = null; 
+            q = p.left;
+            Node t = null;
             //t la ch cua node lon nhat ben con trai
-            while(q.right != null){
-                t = q; q = q.right;
+            while (q.right != null) {
+                t = q;
+                q = q.right;
             }
             Node r = p.right;
             q.right = r;
-            if(f == null){
+            if (f == null) {
                 root = p.left;
-            }
-            else{
-                if(f.left == p) f.left = p.left;
+            } else {
+                if (f.left == p) f.left = p.left;
                 else f.right = p.left;
             }
         }
     }
-   
+
 
     /**
      * Perform breadth-first traversal from the root and delete by copying 
@@ -355,7 +428,7 @@ public class Q2_BSTree {
         }
     }
 
-     /*
+    /*
     Get Node with Person - int age
      */
     public Node getNode(Node p, Person x) {
@@ -452,9 +525,9 @@ public class Q2_BSTree {
         buildArray(a, p);
         int first = 0;
         int last = a.size() - 1;
-        BSTree b = new BSTree();                       // Tao 1 cay moi la cay b
+        BSTree b = new BSTree(); // Tao 1 cay moi la cay b
         b.balance(a, first, last);
-        root = b.root;                                 // Cho goc tro? ve cay b
+        root = b.root; // Cho goc tro? ve cay b
     }
 
     /**
@@ -472,9 +545,9 @@ public class Q2_BSTree {
         return q;
     }
 
-/*
-     ROTATE right
-     */
+    /*
+         ROTATE right
+         */
     public Node rotateRight(Node p) {
         if (p.left == null) {
             return p;
@@ -485,7 +558,7 @@ public class Q2_BSTree {
         return q;
     }
 
-    
+
     /**
      * Quay bat ki Node nao
      * Con trai cua Root ma khac NULL thi quay phai   
@@ -495,18 +568,18 @@ public class Q2_BSTree {
      */
     public void rotateAnyNode() {
         Node p = root;
-        if (p
-                == null) {
+        if (p ==
+            null) {
             return;
         }
         BQueue m = new BQueue();
         m.enqueue(p);
         while (!m.isEmpty()) {
-            Node q = (Node) m.dequeue();         // Lay no ra
-            if (q.left != null) {                 // Neu van con thi q.left
+            Node q = (Node) m.dequeue(); // Lay no ra
+            if (q.left != null) { // Neu van con thi q.left
                 m.enqueue(q.left);
             }
-            if (q.right != null) {                // Neu van con thi q.right
+            if (q.right != null) { // Neu van con thi q.right
                 m.enqueue(q.right);
             }
             if (q.left != null && q.info.price < 7) {
@@ -541,7 +614,7 @@ public class Q2_BSTree {
         }
     }
 
-     /*
+    /*
     GETNODE = xNAME
      */
     public Node getNode(String xName) {
@@ -577,7 +650,7 @@ public class Q2_BSTree {
     /*
     BALANCE-Caculate factor
      */
-    public void calBalance(Node p) {                          // Changed
+    public void calBalance(Node p) { // Changed
         if (p == null) {
             return;
         }
@@ -591,34 +664,34 @@ public class Q2_BSTree {
             if (q.right != null) {
                 m.enqueue(q.right);
             }
-            q.bal = heightOfTree(q.right) - heightOfTree(q.left);           // bal no cho
-            if (isAVL && q.bal < -1 || q.bal > 1) {               // De cho  thuc hien nhieu
+            q.bal = heightOfTree(q.right) - heightOfTree(q.left); // bal no cho
+            if (isAVL && q.bal < -1 || q.bal > 1) { // De cho  thuc hien nhieu
                 isAVL = false;
             }
         }
     }
 
-    boolean isAVL = true;                   // NOTE
-//    calBalance(root);
-//    breadthBal(root, f123);           // Ham nay cho no, de in ra vi o duoi k in vao file
-//    if(isAVL){
-//        f123.writeBytes("\r\nThe tree is an AVL tree\r\n");
-//    }
-//    else{
-//        f123.writeBytes("\r\nThe tree is not an AVL tree\r\n");
-//    }
+    boolean isAVL = true; // NOTE
+    //    calBalance(root);
+    //    breadthBal(root, f123);           // Ham nay cho no, de in ra vi o duoi k in vao file
+    //    if(isAVL){
+    //        f123.writeBytes("\r\nThe tree is an AVL tree\r\n");
+    //    }
+    //    else{
+    //        f123.writeBytes("\r\nThe tree is not an AVL tree\r\n");
+    //    }
     // ---- In ra calLevel cung tuong tu
 
     /**
      * BALANCE-Caculate level of Node
      */
-    public void calLevel(Node p) {                          // Changed
+    public void calLevel(Node p) { // Changed
         if (p == null) {
             return;
         }
         MyQueue m = new MyQueue();
         m.enqueue(p);
-        p.level = 1;                                    // ban dau do cao goc = 1
+        p.level = 1; // ban dau do cao goc = 1
         while (!m.isEmpty()) {
             Node q = (Node) m.dequeue();
             if (q.left != null) {
@@ -689,24 +762,24 @@ public class Q2_BSTree {
         if (root == null) {
             return;
         }
-        while (p.right != null) {               // p.right != null ( p != null )
+        while (p.right != null) { // p.right != null ( p != null )
             p = p.right;
         }
         p.info.age += 1;
-//
-//        Node p = root;
-//        if (p == null) {
-//            return;
-//        }x
+        //
+        //        Node p = root;
+        //        if (p == null) {
+        //            return;
+        //        }x
         MyQueue m = new MyQueue();
         m.enqueue(p);
         Node max = root;
         while (!m.isEmpty()) {
-            Node q = (Node) m.dequeue();         // Lay no ra
-            if (q.left != null) {                 // Neu van con thi q.left
+            Node q = (Node) m.dequeue(); // Lay no ra
+            if (q.left != null) { // Neu van con thi q.left
                 m.enqueue(q.left);
             }
-            if (q.right != null) {                // Neu van con thi q.right
+            if (q.right != null) { // Neu van con thi q.right
                 m.enqueue(q.right);
             }
             if (q.info.age > max.info.age) {
@@ -720,11 +793,11 @@ public class Q2_BSTree {
         MyQueue n = new MyQueue();
         m.enqueue(p1);
         while (!m.isEmpty()) {
-            Node q = (Node) m.dequeue();         // Lay no ra
-            if (q.left != null) {                 // Neu van con thi q.left
+            Node q = (Node) m.dequeue(); // Lay no ra
+            if (q.left != null) { // Neu van con thi q.left
                 m.enqueue(q.left);
             }
-            if (q.right != null) {                // Neu van con thi q.right
+            if (q.right != null) { // Neu van con thi q.right
                 m.enqueue(q.right);
             }
             if (q.info.age == max.info.age) {
@@ -733,9 +806,9 @@ public class Q2_BSTree {
             }
         }
     }
-    
+
     boolean isAVL = true;
-    public void checkAVL(){
+    public void checkAVL() {
         MyQueue q = new MyQueue();
         q.enqueue(root);
         Node r;
@@ -760,5 +833,5 @@ public class Q2_BSTree {
             f123.writeBytes("\r\nThe tree is an AVL tree\r\n");
         }
     }
-    
+
 }
